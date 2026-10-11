@@ -10,14 +10,10 @@ export async function onRequestGet(context){
  const request=new URL(context.request.url);const country=(request.searchParams.get("country")||"IN").toUpperCase();const language=(request.searchParams.get("language")||"en").toLowerCase();
  if(!NEWS[country]||!LANGS[language])return Response.json({error:"Unsupported country or language selection."},{status:400,headers:{"cache-control":"no-store"}});
  const locale={...NEWS[country]};
- if(language==="hi"&&country==="IN"){locale.hl="hi-IN";locale.ceid="IN:hi"}
- if(language==="mr"&&country==="IN"){locale.hl="mr";locale.ceid="IN:mr"}
- if(language==="pt"&&country==="BR"){locale.hl="pt-BR";locale.ceid="BR:pt-419"}
- if(language==="de"&&country==="DE"){locale.hl="de";locale.ceid="DE:de"}
- if(language==="fr"&&country==="FR"){locale.hl="fr";locale.ceid="FR:fr"}
- if(language==="ja"&&country==="JP"){locale.hl="ja";locale.ceid="JP:ja"}
- if(language==="ko"&&country==="KR"){locale.hl="ko";locale.ceid="KR:ko"}
- if(language==="es"&&country==="MX"){locale.hl="es-419";locale.ceid="MX:es-419"}
+ if(language!=="en"){
+   locale.hl=language==="hi"?"hi-IN":language==="pt"?"pt-BR":language==="es"?"es-419":LANGS[language];
+   locale.ceid=country+":"+LANGS[language];
+ }
  const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language);
  const cache=typeof caches!=="undefined"?caches.default:null;
  if(cache){const cached=await cache.match(cacheKey);if(cached)return cached}
