@@ -95,6 +95,6 @@ $("copyStoryPromptBtn").addEventListener("click",async()=>{
 $("alertsOpenBtn").addEventListener("click",openAlerts);$("manageAlertsBtn").addEventListener("click",openAlerts);$("closeAlertBtn").addEventListener("click",closeAlerts);$("alertDialog").addEventListener("click",e=>{if(e.target===$("alertDialog"))closeAlerts()});document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAlerts()});$("permissionBtn").addEventListener("click",requestPermission);$("saveAlertsBtn").addEventListener("click",saveAlertSettings);
 $("menuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));document.addEventListener("click",e=>{if(window.innerWidth<=850&&$("sidebar").classList.contains("open")&&!$("sidebar").contains(e.target)&&!$("menuBtn").contains(e.target))$("sidebar").classList.remove("open")});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){configurePolling()}else stopPolling()});
-if("serviceWorker"in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}))}
+if("serviceWorker"in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js",{updateViaCache:"none"}).then(reg=>reg.update()).catch(()=>{}))}
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e});
 renderWatchlist();updatePermissionStatus();loadTrends();configurePolling();
