@@ -1,4 +1,4 @@
-import { randomToken, sha256, passwordHash, setCookie, uid } from "../_lib.js";
+import { randomToken, sha256, setCookie, uid } from "../_lib.js";
 
 function getCookie(request, name) {
   const raw = request.headers.get("Cookie") || "";
@@ -87,8 +87,11 @@ export async function onRequestGet({ request, env }) {
       if (!userId) {
         userId = uid();
         stage = "prepare_user";
+        // Google-only accounts do not receive a password. Store an independent,
+        // unguessable placeholder so OAuth account creation does not depend on
+        // password derivation; the password-login verifier cannot match this value.
         const salt = randomToken(16);
-        const hash = await passwordHash(randomToken(48), salt);
+        const hash = randomToken(32);
 
         stage = "insert_user";
         // Handle two Google callbacks arriving at nearly the same time for the same email.
