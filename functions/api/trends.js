@@ -19,7 +19,7 @@ export async function onRequestGet(context){
  if(language==="ko"&&country==="KR"){locale.hl="ko";locale.ceid="KR:ko"}
  if(language==="es"&&country==="MX"){locale.hl="es-419";locale.ceid="MX:es-419"}
  const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language);
- const cache=context.env?.TREND_CACHE?null:caches.default;
+ const cache=typeof caches!=="undefined"?caches.default:null;
  if(cache){const cached=await cache.match(cacheKey);if(cached)return cached}
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
  const newsUrl="https://news.google.com/rss?"+new URLSearchParams(locale).toString();
