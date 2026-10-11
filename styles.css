@@ -44,3 +44,7 @@
 .pro-launch-price .button{width:100%;margin:10px 0 5px}
 .pro-launch-price em{display:block;font-size:9px;line-height:1.6;color:#e8bd81;font-style:normal}
 @media(max-width:760px){.pro-launch-panel{grid-template-columns:1fr;padding:18px}.pro-launch-price{max-width:420px}.pro-launch-copy h2{font-size:22px}}
+
+/* Pro members never see display ads; AdSense remains disabled until configured. */
+html[data-plan="pro"] .adsense-slot,html[data-plan="pro"] [data-adsense-slot]{display:none!important}
+[data-adsense-slot][hidden]{display:none!important}
