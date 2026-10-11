@@ -17,30 +17,35 @@ const LOCAL_TERMS={
 function decodeXml(value=""){return value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,"$1").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi,(_,n)=>String.fromCodePoint(parseInt(n,16))).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()}
 function tag(xml,name){const escaped=name.replace(/[.*+?^\${}()|[\]\\]/g,"\\$&");const m=xml.match(new RegExp("<(?:[\\w.-]+:)?"+escaped+"(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?"+escaped+"\\s*>","i"));return m?decodeXml(m[1]):""}
 function matchesFeedLanguage(title,language){
- if(language==="en")return !/[\\u0E00-\\u0E7F\\u0C00-\\u0C7F\\u0B80-\\u0BFF\\u0D00-\\u0D7F\\u0900-\\u097F\\u3040-\\u30FF\\uAC00-\\uD7AF\\u4E00-\\u9FFF]/u.test(title);
- if(language==="ja")return /[\\u3040-\\u30FF]/u.test(title);
- if(language==="ko")return /[\\uAC00-\\uD7AF]/u.test(title);
- if(language==="hi"||language==="mr")return /[\\u0900-\\u097F]/u.test(title);
+ // Unicode ranges are intentionally real regex escapes, not literal backslash text.
+ if(language==="en")return !/[\u0E00-\u0E7F\u0C00-\u0C7F\u0B80-\u0BFF\u0D00-\u0D7F\u0900-\u097F\u3040-\u30FF\uAC00-\uD7AF\u4E00-\u9FFF]/u.test(title);
+ if(language==="ja")return /[\u3040-\u30FF\u4E00-\u9FFF]/u.test(title);
+ if(language==="ko")return /[\uAC00-\uD7AF]/u.test(title);
+ if(language==="hi"||language==="mr")return /[\u0900-\u097F]/u.test(title);
+ if(language==="pt"||language==="de"||language==="fr"||language==="es")return true;
  return true;
 }
 function parseFeed(xml,source,limit=40,category="all",country="IN"){const chunks=xml.match(/<(?:item|entry)(?:\s[^>]*)?>[\s\S]*?<\/(?:item|entry)\s*>/gi)||[];return chunks.slice(0,limit).map(chunk=>{const title=tag(chunk,"title");let link=tag(chunk,"link");if(!link){const m=chunk.match(/<link[^>]+href=["']([^"']+)["']/i);if(m)link=m[1]}const guid=tag(chunk,"guid")||tag(chunk,"id");const pub=tag(chunk,"pubDate")||tag(chunk,"published")||tag(chunk,"updated");const desc=tag(chunk,"description")||tag(chunk,"summary")||tag(chunk,"content");if(!title)return null;const feedUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);const directLink=source==="Google Trends"&&(!link||link===feedUrl||link.includes("/trending/rss"))?"https://trends.google.com/trends/explore?q="+encodeURIComponent(title)+"&geo="+encodeURIComponent(country):(link||"");return{key:source+":"+((guid||link||title).slice(0,220)),title,url:directLink,summary:desc.slice(0,260),publishedAt:pub,source,category}}).filter(x=>x&&x.title)}
-async function fetchFeed(url,source,limit,category,country="IN"){
- const headers={"accept":"application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8","user-agent":"TrendRadar/0.3 (public RSS reader)"};
- const urls=[url];
+async function fetchFeed(url,source,limit,category,country="IN",language="en"){
+ const headers={"accept":"application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8","user-agent":"Mozilla/5.0 (compatible; TrendRadar/0.3; public RSS reader)"};
+ const candidates=[{url,source}];
  if(source==="Google News"){
   const parsed=new URL(url),params=new URLSearchParams(parsed.search);
   const fallback=new URLSearchParams(params);
-  fallback.set("q","when:1d");
-  urls.push("https://news.google.com/rss/search?"+fallback.toString());
+  fallback.set("q",params.get("q")||"when:1d");
+  candidates.push({url:"https://news.google.com/rss/search?"+fallback.toString(),source:"Google News"});
+  const query=params.get("q")||"India latest news";
+  const bingLang=({en:"en-IN",hi:"hi-IN",mr:"mr-IN",pt:"pt-BR",de:"de-DE",fr:"fr-FR",ja:"ja-JP",ko:"ko-KR",es:"es-ES"})[language]||"en-IN";
+  candidates.push({url:"https://www.bing.com/news/search?q="+encodeURIComponent(query)+"&format=rss&setlang="+encodeURIComponent(bingLang),source:"Bing News"});
  }
  let lastError;
- for(const candidate of [...new Set(urls)]){
+ for(const candidate of candidates){
   try{
-   const response=await fetch(candidate,{headers,signal:AbortSignal.timeout(8500)});
-   if(!response.ok)throw new Error(source+" feed returned "+response.status);
-   const xml=await response.text(),items=parseFeed(xml,source,limit,category,country);
-   if(items.length||candidate===urls[urls.length-1])return items;
-   lastError=new Error(source+" feed returned no parseable items");
+   const response=await fetch(candidate.url,{headers,signal:AbortSignal.timeout(8500)});
+   if(!response.ok)throw new Error(candidate.source+" feed returned "+response.status);
+   const xml=await response.text(),items=parseFeed(xml,candidate.source,limit,category,country);
+   if(items.length)return items;
+   lastError=new Error(candidate.source+" feed returned no parseable items");
   }catch(error){lastError=error}
  }
  throw lastError||new Error(source+" feed unavailable")
@@ -54,7 +59,7 @@ export async function onRequestGet(context){
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
  const newsLocale={...locale};if(CATEGORIES[category])newsLocale.q=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category];
  const newsUrl="https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
- const results=await Promise.allSettled([fetchFeed(trendsUrl,"Google Trends",40,"all",country),fetchFeed(newsUrl,"Google News",50,category,country)]);
+ const results=await Promise.allSettled([fetchFeed(trendsUrl,"Google Trends",40,"all",country),fetchFeed(newsUrl,"Google News",50,category,country,language)]);
  const items=[],sources=[],errors=[];
  results.forEach((result,index)=>{if(result.status==="fulfilled"){const feedItems=index===0?result.value.filter(item=>matchesFeedLanguage(item.title,language)):result.value;items.push(...feedItems);if(feedItems.length)sources.push(feedItems[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
  const unique=[...new Map(items.filter(i=>i.title).map(i=>[i.key,i])).values()].sort((a,b)=>(Date.parse(b.publishedAt)||0)-(Date.parse(a.publishedAt)||0)).slice(0,80);
