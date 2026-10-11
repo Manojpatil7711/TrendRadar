@@ -25,9 +25,13 @@ export async function onRequestGet({ request, env }) {
     return redirect(request, "google_not_configured");
   }
   if (!code || !state || !saved || state !== saved) {
-    return redirect(request, "google_failed");
+    console.error("Google sign-in state validation failed", {
+      hasCode: Boolean(code), hasState: Boolean(state), hasSavedState: Boolean(saved), stateMatches: Boolean(state && saved && state === saved)
+    });
+    return redirect(request, "google_state_failed");
   }
 
+  let tokenData;
   try {
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -40,17 +44,32 @@ export async function onRequestGet({ request, env }) {
         grant_type: "authorization_code"
       })
     });
-    const tokenData = await tokenResponse.json();
-    if (!tokenResponse.ok || !tokenData.access_token) return redirect(request, "google_failed");
+    tokenData = await tokenResponse.json();
+    if (!tokenResponse.ok || !tokenData.access_token) {
+      console.error("Google OAuth token exchange rejected", { status: tokenResponse.status, error: tokenData.error || "missing_access_token" });
+      return redirect(request, "google_token_failed");
+    }
+  } catch (error) {
+    console.error("Google OAuth token exchange request failed", String(error));
+    return redirect(request, "google_token_failed");
+  }
 
+  let google;
+  try {
     const userResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
       headers: { authorization: "Bearer " + tokenData.access_token }
     });
-    const google = await userResponse.json();
+    google = await userResponse.json();
     if (!userResponse.ok || !google.sub || !google.email || google.email_verified !== true) {
-      return redirect(request, "google_failed");
+      console.error("Google userinfo response rejected", { status: userResponse.status, hasSub: Boolean(google.sub), hasEmail: Boolean(google.email), emailVerified: google.email_verified === true });
+      return redirect(request, "google_profile_failed");
     }
+  } catch (error) {
+    console.error("Google userinfo request failed", String(error));
+    return redirect(request, "google_profile_failed");
+  }
 
+  try {
     const now = Math.floor(Date.now() / 1000);
     const email = String(google.email).trim().toLowerCase();
     const linked = await env.MEMBERS_DB.prepare(
@@ -89,7 +108,7 @@ export async function onRequestGet({ request, env }) {
     headers.append("Set-Cookie", "tr_google_state=; Path=/api/auth/google; HttpOnly; Secure; SameSite=Lax; Max-Age=0");
     return new Response(null, { status: 302, headers });
   } catch (error) {
-    console.error("Google sign-in failed", error);
-    return redirect(request, "google_failed");
+    console.error("Google account/session creation failed", String(error));
+    return redirect(request, "google_account_failed");
   }
 }
