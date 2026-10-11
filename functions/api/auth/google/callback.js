@@ -91,13 +91,23 @@ export async function onRequestGet({ request, env }) {
         const hash = await passwordHash(randomToken(48), salt);
 
         stage = "insert_user";
+        // Handle two Google callbacks arriving at nearly the same time for the same email.
         await env.MEMBERS_DB.prepare(
-          "INSERT INTO users(id,email,password_salt,password_hash,created_at) VALUES(?,?,?,?,?)"
+          "INSERT OR IGNORE INTO users(id,email,password_salt,password_hash,created_at) VALUES(?,?,?,?,?)"
         ).bind(userId, email, salt, hash, now).run();
+
+        // If another request created the same email first, continue with that stable user ID.
+        const savedUser = await env.MEMBERS_DB.prepare(
+          "SELECT id FROM users WHERE email=?"
+        ).bind(email).first();
+        if (!savedUser?.id) {
+          throw new Error("User insert completed without a readable user row");
+        }
+        userId = savedUser.id;
 
         stage = "insert_membership";
         await env.MEMBERS_DB.prepare(
-          "INSERT INTO memberships(user_id,plan,status,updated_at) VALUES(?,'free','inactive',?)"
+          "INSERT OR IGNORE INTO memberships(user_id,plan,status,updated_at) VALUES(?,'free','inactive',?)"
         ).bind(userId, now).run();
       }
 
