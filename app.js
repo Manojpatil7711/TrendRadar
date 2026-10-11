@@ -73,7 +73,25 @@ function setFeed(feed){selectedFeed=feed;document.querySelectorAll(".feed-tab").
 function goView(view){const map={discover:{id:"trendsSection",label:"Trend radar"},watchlist:{id:"watchlistSection",label:"My watchlist"},briefing:{id:"briefingSection",label:"Creator briefing"}};const target=map[view]||map.discover;$("breadcrumbCurrent").textContent=target.label;document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));$(target.id).scrollIntoView({behavior:"smooth",block:"start"});$("sidebar").classList.remove("open")}
 $("refreshBtn").addEventListener("click",()=>loadTrends());$("country").addEventListener("change",()=>{ $("topRegion").textContent=countryNames[$("country").value];visibleCount=12;loadTrends()});$("language").addEventListener("change",()=>loadTrends());$("search").addEventListener("input",()=>{visibleCount=12;render()});$("clearSearch").addEventListener("click",()=>{$("search").value="";render();$("search").focus()});$("sortOrder").addEventListener("change",render);
 document.querySelectorAll(".category-card").forEach(b=>b.addEventListener("click",()=>setCategory(b.dataset.category)));document.querySelectorAll(".feed-tab").forEach(b=>b.addEventListener("click",()=>setFeed(b.dataset.feed)));
-$("loadMoreBtn").addEventListener("click",()=>{visibleCount+=12;render()});$("ideaBtn").addEventListener("click",makeIdeas);document.querySelectorAll(".nav-item").forEach(b=>b.addEventListener("click",()=>goView(b.dataset.view)));
+$("loadMoreBtn").addEventListener("click",()=>{visibleCount+=12;render()});$("ideaBtn").addEventListener("click",makeIdeas);
+function buildWorkspacePrompt(){
+ const topic=safeText($("ideaTopic").value)||safeText(allItems[0]?.title)||"the selected trending topic";
+ const sourceText=String($("sourceText").value||"").trim();
+ const sourceItem=allItems.find(item=>item.title.toLowerCase()===topic.toLowerCase());
+ const pasted=sourceText ? "\n\nSOURCE TEXT PROVIDED BY THE USER (treat as unverified until checked):\n"+sourceText : "\n\nNo article text was pasted. Inspect the source link if accessible; otherwise ask the user to paste it.";
+ return makeSourcePrompt(topic,sourceItem?.url||"", $("format").value)+pasted;
+}
+$("copyStoryPromptBtn").addEventListener("click",async()=>{
+ const prompt=buildWorkspacePrompt();
+ try{
+  await navigator.clipboard.writeText(prompt);
+  $("sourcePromptStatus").textContent="Prompt copied. Open your preferred AI and paste it; it asks the AI to verify claims and not invent facts.";
+  notify("Copy-ready research prompt prepared");
+ }catch{
+  $("sourcePromptStatus").textContent="Clipboard access was blocked. Copy the topic and source text manually, then paste them into your AI tool.";
+  notify("Clipboard unavailable");
+ }
+});document.querySelectorAll(".nav-item").forEach(b=>b.addEventListener("click",()=>goView(b.dataset.view)));
 $("alertsOpenBtn").addEventListener("click",openAlerts);$("manageAlertsBtn").addEventListener("click",openAlerts);$("closeAlertBtn").addEventListener("click",closeAlerts);$("alertDialog").addEventListener("click",e=>{if(e.target===$("alertDialog"))closeAlerts()});document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAlerts()});$("permissionBtn").addEventListener("click",requestPermission);$("saveAlertsBtn").addEventListener("click",saveAlertSettings);
 $("menuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));document.addEventListener("click",e=>{if(window.innerWidth<=850&&$("sidebar").classList.contains("open")&&!$("sidebar").contains(e.target)&&!$("menuBtn").contains(e.target))$("sidebar").classList.remove("open")});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){configurePolling()}else stopPolling()});
