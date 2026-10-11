@@ -48,6 +48,10 @@ function render(){
    card.append(top,title,summary,bottom,pulse,aiActions);grid.append(card);
  });
 }
+const sponsoredTargets=["https://uplcm.com/4/11565407","https://uplcm.com/4/11918611","https://uplcm.com/4/11949301","https://uplcm.com/4/11566837","https://uplcm.com/4/11918605","https://mergerindirect.com/ybu4ut7r?key=dbfefcbb48fa3075cc6df76b00266c70","https://mergerindirect.com/enjf2abtxj?key=b47585e59da9216b6710b975c9427d62","https://mergerindirect.com/gki9pg3ue?key=c076db285a55d97b0d4108e71fb80248","https://mergerindirect.com/bkgdinwpwf?key=42404284f875722fcb453dd529a77edf","https://mergerindirect.com/kf1ujxf25k?key=258266315b32d7e7a6335f103ba86138"];
+let sponsoredRotation=0;
+function rotateSponsoredLinks(){document.querySelectorAll("a[data-sponsored-slot]").forEach((link,index)=>{link.href=sponsoredTargets[(sponsoredRotation+index)%sponsoredTargets.length];link.rel="sponsored noopener noreferrer";link.referrerPolicy="no-referrer";});}
+document.addEventListener("DOMContentLoaded",()=>{rotateSponsoredLinks();document.querySelectorAll("a[data-sponsored-slot]").forEach(link=>link.addEventListener("click",()=>{sponsoredRotation=(sponsoredRotation+1)%sponsoredTargets.length;setTimeout(rotateSponsoredLinks,0)}));});
 function persistWatchlist(){localStorage.setItem("trendradar-watchlist",JSON.stringify(watchlist))}
 function toggleWatch(item){const i=watchlist.findIndex(w=>w.key===item.key);if(i>=0)watchlist.splice(i,1);else watchlist.unshift({key:item.key,title:item.title,url:item.url,source:item.source,category:item.category||selectedCategory,publishedAt:item.publishedAt||"",savedAt:new Date().toISOString()});watchlist=watchlist.slice(0,80);persistWatchlist();renderWatchlist();render();notify(i>=0?"Removed from your watchlist":"Topic saved to your watchlist")}
 function dateLabel(value){if(!value)return"Date unavailable";const d=new Date(value);if(!Number.isFinite(d.getTime()))return"Date unavailable";return d.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}
