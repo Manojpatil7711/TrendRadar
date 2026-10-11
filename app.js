@@ -31,7 +31,21 @@ function render(){
   promptBtn.addEventListener("click",async()=>{const prompt=makeSourcePrompt(item.title,item.url,$("format").value);try{await navigator.clipboard.writeText(prompt);notify("Source-aware AI prompt copied. Paste it into your AI tool.");promptBtn.textContent="Prompt copied ✓";setTimeout(()=>{promptBtn.textContent="Copy AI research prompt"},1800)}catch{ $("ideaTopic").value=item.title; $("ideaTopic").focus(); notify("Clipboard unavailable. Topic copied into the creator workspace; select it and copy manually.")}});
   const chatgpt=document.createElement("a");chatgpt.className="ai-open-link";chatgpt.href="https://chatgpt.com/";chatgpt.target="_blank";chatgpt.rel="noopener noreferrer";chatgpt.textContent="Open ChatGPT ↗";
   const gemini=document.createElement("a");gemini.className="ai-open-link";gemini.href="https://gemini.google.com/";gemini.target="_blank";gemini.rel="noopener noreferrer";gemini.textContent="Gemini ↗";
-  aiActions.append(promptBtn,chatgpt,gemini);card.append(top,title,summary,bottom,aiActions);grid.append(card);
+  aiActions.append(promptBtn,chatgpt,gemini);
+   const pulse=document.createElement("div");pulse.className="video-pulse";
+   const pulseHead=document.createElement("div");pulseHead.className="video-pulse-head";
+   const pulseTitle=document.createElement("span");pulseTitle.className="video-pulse-title";pulseTitle.textContent="⏱ VIDEO / CREATOR PULSE";
+   const pulseNote=document.createElement("span");pulseNote.className="video-pulse-note";const published=Date.parse(item.publishedAt),ageHours=Number.isFinite(published)?Math.max(0,(Date.now()-published)/3600000):Infinity;
+   if(item.source==="Google Trends"){pulseNote.textContent="Search signal detected";pulseNote.dataset.level="search"}else if(ageHours<=24){pulseNote.textContent="Fresh news signal";pulseNote.dataset.level="fresh"}else if(ageHours<=72){pulseNote.textContent="Developing topic";pulseNote.dataset.level="developing"}else{pulseNote.textContent="Older signal";pulseNote.dataset.level="older"}
+   pulseHead.append(pulseTitle,pulseNote);
+   const platformRow=document.createElement("div");platformRow.className="platform-search-row";
+   const query=encodeURIComponent(item.title);
+   const platforms=[{name:"YouTube",short:"▶ YouTube",url:"https://www.youtube.com/results?search_query="+query,cls:"youtube"},{name:"Instagram",short:"◎ Instagram",url:"https://www.instagram.com/explore/search/keyword/?q="+query,cls:"instagram"},{name:"TikTok",short:"♪ TikTok",url:"https://www.tiktok.com/search?q="+query,cls:"tiktok"},{name:"Facebook",short:"f Facebook",url:"https://www.facebook.com/search/videos/?q="+query,cls:"facebook"}];
+   platforms.forEach(p=>{const l=document.createElement("a");l.className="platform-search "+p.cls;l.href=p.url;l.target="_blank";l.rel="noopener noreferrer";l.textContent=p.short;l.setAttribute("aria-label","Search "+p.name+" videos about "+item.title);platformRow.append(l)});
+   const pulseFoot=document.createElement("div");pulseFoot.className="video-pulse-foot";pulseFoot.textContent="Estimate uses feed freshness/search signals—not verified video counts or views.";
+   const trendsLink=document.createElement("a");trendsLink.className="google-pulse-link";trendsLink.href="https://trends.google.com/trends/explore?geo="+encodeURIComponent($("country").value)+"&q="+query;trendsLink.target="_blank";trendsLink.rel="noopener noreferrer";trendsLink.textContent="Check Google search interest ↗";
+   pulse.append(pulseHead,platformRow,pulseFoot,trendsLink);
+   card.append(top,title,summary,bottom,pulse,aiActions);grid.append(card);
  });
 }
 function persistWatchlist(){localStorage.setItem("trendradar-watchlist",JSON.stringify(watchlist))}
