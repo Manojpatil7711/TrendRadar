@@ -1,2 +1,1 @@
-import { json, sessionUser } from "./_lib.js";
-export async function onRequestGet({request,env}) { const user=await sessionUser(request,env); return json({ok:true,user:user?{email:user.email,plan:user.plan,pro:user.pro,expiresAt:user.expiresAt}:null}); }
+export async function onRequest() { return Response.json({ ok: false, error: "temporarily_disabled", message: "Account sign-in and paid membership are temporarily disabled." }, { status: 410, headers: { "cache-control": "no-store" } }); }
