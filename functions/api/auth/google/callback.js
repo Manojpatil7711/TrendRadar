@@ -69,31 +69,45 @@ export async function onRequestGet({ request, env }) {
     return redirect(request, "google_profile_failed");
   }
 
+  let stage = "lookup_account";
   try {
     const now = Math.floor(Date.now() / 1000);
     const email = String(google.email).trim().toLowerCase();
+
+    stage = "lookup_google_link";
     const linked = await env.MEMBERS_DB.prepare(
       "SELECT user_id FROM oauth_accounts WHERE provider='google' AND provider_user_id=?"
     ).bind(google.sub).first();
 
     let userId = linked?.user_id;
     if (!userId) {
+      stage = "lookup_email";
       const existing = await env.MEMBERS_DB.prepare("SELECT id FROM users WHERE email=?").bind(email).first();
       userId = existing?.id;
       if (!userId) {
         userId = uid();
+        stage = "prepare_user";
         const salt = randomToken(16);
         const hash = await passwordHash(randomToken(48), salt);
-        await env.MEMBERS_DB.batch([
-          env.MEMBERS_DB.prepare("INSERT INTO users(id,email,password_salt,password_hash,created_at) VALUES(?,?,?,?,?)").bind(userId, email, salt, hash, now),
-          env.MEMBERS_DB.prepare("INSERT INTO memberships(user_id,plan,status,updated_at) VALUES(?,'free','inactive',?)").bind(userId, now)
-        ]);
+
+        stage = "insert_user";
+        await env.MEMBERS_DB.prepare(
+          "INSERT INTO users(id,email,password_salt,password_hash,created_at) VALUES(?,?,?,?,?)"
+        ).bind(userId, email, salt, hash, now).run();
+
+        stage = "insert_membership";
+        await env.MEMBERS_DB.prepare(
+          "INSERT INTO memberships(user_id,plan,status,updated_at) VALUES(?,'free','inactive',?)"
+        ).bind(userId, now).run();
       }
+
+      stage = "link_google_account";
       await env.MEMBERS_DB.prepare(
         "INSERT INTO oauth_accounts(provider,provider_user_id,user_id,created_at) VALUES('google',?,?,?)"
       ).bind(google.sub, userId, now).run();
     }
 
+    stage = "insert_session";
     const token = randomToken();
     const tokenHash = await sha256(token);
     await env.MEMBERS_DB.prepare(
@@ -108,7 +122,7 @@ export async function onRequestGet({ request, env }) {
     headers.append("Set-Cookie", "tr_google_state=; Path=/api/auth/google; HttpOnly; Secure; SameSite=Lax; Max-Age=0");
     return new Response(null, { status: 302, headers });
   } catch (error) {
-    console.error("Google account/session creation failed", String(error));
-    return redirect(request, "google_account_failed");
+    console.error("Google account/session creation failed at stage:", stage, String(error));
+    return redirect(request, "google_" + stage + "_failed");
   }
 }
