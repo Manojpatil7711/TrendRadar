@@ -18,7 +18,7 @@ export async function onRequestGet(context){
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
  const newsLocale={...locale};if(CATEGORIES[category])newsLocale.q=CATEGORIES[category];
  const newsUrl="https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
- const results=await Promise.allSettled([fetchFeed(trendsUrl,"Google Trends",25,category),fetchFeed(newsUrl,"Google News",35,category)]);
+ const results=await Promise.allSettled([fetchFeed(trendsUrl,"Google Trends",25,"all"),fetchFeed(newsUrl,"Google News",35,category)]);
  const items=[],sources=[],errors=[];
  results.forEach(result=>{if(result.status==="fulfilled"){items.push(...result.value);if(result.value.length)sources.push(result.value[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
  const unique=[...new Map(items.filter(i=>i.title).map(i=>[i.key,i])).values()].sort((a,b)=>(Date.parse(b.publishedAt)||0)-(Date.parse(a.publishedAt)||0)).slice(0,60);
