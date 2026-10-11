@@ -12,7 +12,7 @@ export async function onRequestGet(context){
  const locale={...NEWS[country]};
  if(language!=="en"){
    locale.hl=language==="hi"?"hi-IN":language==="pt"?"pt-BR":language==="es"?"es-419":LANGS[language];
-   locale.ceid=country+":"+LANGS[language];
+   locale.ceid=country+":"+(language==="pt"?"pt-419":language==="es"?"es-419":LANGS[language]);
  }
  const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language);
  const cache=typeof caches!=="undefined"?caches.default:null;
