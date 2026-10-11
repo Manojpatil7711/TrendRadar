@@ -1,7 +1,7 @@
 import { randomToken } from "./_lib.js";
 
 export async function onRequestGet({ request, env }) {
-  if (!env.GOOGLE_CLIENT_ID) {
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.MEMBERS_DB) {
     return Response.redirect(new URL("/account.html?error=google_not_configured", request.url).toString(), 302);
   }
 
