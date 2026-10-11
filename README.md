@@ -14,7 +14,7 @@
 - Creator angle studio with format-specific prompts; these are idea starters, not AI-generated research or verified facts.
 - Configurable keyword/category browser notifications and periodic feed checks while the page remains open.
 - Installable web-app manifest and service worker shell caching.
-- Privacy and terms pages; no login, paid API key, or database required for this first beta.
+- Google sign-in, Cloudflare D1-backed account sessions and membership records (requires correctly configured Google OAuth secrets and D1 binding).\n- Pro membership checkout code for Razorpay; live payments remain disabled until Razorpay keys and webhook secret are configured and verified.\n- Privacy and terms pages.
 
 ## Accuracy and coverage limits
 
@@ -67,6 +67,6 @@ No paid domain or paid service is needed just to validate the first beta. Confir
 2. Add platform-specific data only after checking each source's terms, access, reliability, and cost.
 3. Implement true background push with subscription consent, VAPID, secure storage, abuse controls, and delivery monitoring.
 4. Add trend-history and growth indicators only where the underlying data supports the calculation.
-5. Consider user accounts or subscriptions only after testing real user demand and operating costs.
+5. Validate Google OAuth and Razorpay configuration in a preview environment before enabling account or payment flows in production.\n6. Test demand and operating costs before investing in new data providers or paid services.
 
 Contact: manojpatil7711@gmail.com
