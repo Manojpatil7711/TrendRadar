@@ -29,3 +29,22 @@
 /* Per-story platform search shortcuts and transparent creator pulse */
 .video-pulse{margin:12px 0 2px;padding:11px 12px;border:1px solid #2d3c51;border-radius:11px;background:linear-gradient(110deg,rgba(18,29,47,.9),rgba(12,20,34,.7));min-width:0}.video-pulse-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.video-pulse-title{font:9px 'DM Mono',monospace;letter-spacing:.7px;color:#9caec6}.video-pulse-note{font-size:9px;color:#dbe6f4;padding:4px 7px;border-radius:6px;background:#26364a}.video-pulse-note[data-level="search"]{color:#d7f99b;background:#26351e}.video-pulse-note[data-level="fresh"]{color:#a9dcff;background:#172e43}.video-pulse-note[data-level="older"]{color:#a4afbf;background:#252e3b}.platform-search-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px}.platform-search{display:inline-flex;align-items:center;justify-content:center;min-height:29px;padding:6px 9px;border:1px solid #35455d;border-radius:7px;text-decoration:none!important;font-size:9px;font-weight:700;color:#dfe8f5;background:#101a2a;transition:border-color .15s,transform .15s}.platform-search:hover{border-color:#9fb5d2;transform:translateY(-1px)}.platform-search.youtube{border-color:#64343a}.platform-search.instagram{border-color:#59415f}.platform-search.tiktok{border-color:#3d5260}.platform-search.facebook{border-color:#344d77}.video-pulse-foot{margin-top:8px;color:#7f91a9;font-size:8px;line-height:1.55}.google-pulse-link{display:inline-block;margin-top:6px;font-size:9px;color:#c9f36a;text-decoration:none}.google-pulse-link:hover{text-decoration:underline}
 @media(max-width:420px){.video-pulse{padding:9px}.platform-search-row{gap:5px}.platform-search{padding:6px 7px;font-size:8px}.video-pulse-head{align-items:flex-start;flex-direction:column}}
+
+/* TrendRadar Pro membership entry point */
+.pro-launch-panel{display:grid;grid-template-columns:minmax(0,1fr) 255px;gap:26px;align-items:center;margin:28px 0 10px;padding:24px;border:1px solid #354b3c;border-radius:16px;background:radial-gradient(ellipse at 100% 0,#314332 0,transparent 42%),linear-gradient(120deg,#142131,#101827)}
+.pro-launch-eyebrow{font:9px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--lime)}
+.pro-launch-copy h2{font-size:clamp(20px,2.4vw,29px);line-height:1.25;letter-spacing:-.8px;margin:8px 0}
+.pro-launch-copy p{font-size:11px;line-height:1.8;color:#a9b6ca;max-width:650px}
+.pro-launch-points{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#c6d2e3}
+.pro-launch-points span: first-letter{color:var(--lime)}
+.pro-launch-price{padding:17px;border:1px solid #3b5140;border-radius:12px;background:#0b1422c9}
+.pro-launch-label,.pro-launch-price small{display:block;color:#9eafc3;font-size:10px}
+.pro-launch-price strong{display:block;font-size:34px;letter-spacing:-1.5px;margin:2px 0}
+.pro-launch-price strong span{font-size:12px;letter-spacing:0;color:#a9b6ca}
+.pro-launch-price .button{width:100%;margin:10px 0 5px}
+.pro-launch-price em{display:block;font-size:9px;line-height:1.6;color:#e8bd81;font-style:normal}
+@media(max-width:760px){.pro-launch-panel{grid-template-columns:1fr;padding:18px}.pro-launch-price{max-width:420px}.pro-launch-copy h2{font-size:22px}}
+
+/* Pro members never see display ads; AdSense remains disabled until configured. */
+html[data-plan="pro"] .adsense-slot,html[data-plan="pro"] [data-adsense-slot]{display:none!important}
+[data-adsense-slot][hidden]{display:none!important}
