@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101522">
+  <meta name="description" content="Daily trending updates, breaking topics and content ideas for creators worldwide. Explore country-specific signals from public trend and news feeds.">
+  <title>TrendRadar — Daily trends for every creator</title>
+  <link rel="canonical" href="https://trendradar.pages.dev/">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="TrendRadar home"><span class="brand-mark">↗</span><span>Trend<span class="brand-accent">Radar</span><small>CREATOR INTELLIGENCE</small></span></a>
+    <div class="top-actions"><span class="live-dot"></span><span class="muted">Public trend signals</span><button id="notifyBtn" class="button button-quiet" type="button">Enable alerts</button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-line"></span> THE WORLD IS MOVING. STAY AHEAD.</div>
+      <h1>Catch the trend.<br><span>Make it yours.</span></h1>
+      <p class="hero-copy">Daily trend signals, breaking topics and fresh content angles for creators on every platform. Start with what's gaining attention, then make something original.</p>
+      <div class="hero-note"><span>✦</span> Sources are linked. Unverified platform activity counts are never invented.</div>
+    </section>
+    <section class="controls panel" aria-label="Trend filters">
+      <label>REGION<select id="country"><option value="IN">India</option><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="AU">Australia</option><option value="BR">Brazil</option><option value="DE">Germany</option><option value="FR">France</option><option value="JP">Japan</option><option value="KR">South Korea</option><option value="SG">Singapore</option><option value="ZA">South Africa</option><option value="MX">Mexico</option><option value="NG">Nigeria</option></select></label>
+      <label>LANGUAGE<select id="language"><option value="en">English</option><option value="hi">Hindi</option><option value="mr">Marathi</option><option value="pt">Portuguese</option><option value="de">German</option><option value="fr">French</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="es">Spanish</option></select></label>
+      <label class="search-label">SEARCH TOPICS<input id="search" type="search" placeholder="e.g. AI, cricket, beauty..." autocomplete="off"></label>
+      <button id="refreshBtn" class="button button-primary" type="button">↻ Refresh trends</button>
+    </section>
+    <section class="section-head">
+      <div><div class="section-kicker">RIGHT NOW</div><h2>Trend radar <span id="regionLabel">India</span></h2></div>
+      <span id="updatedAt" class="updated">Waiting for live feed…</span>
+    </section>
+    <div class="source-strip"><span class="source-label">FEEDS</span><span class="source-chip">Google Trends</span><span class="source-chip">Google News</span><span class="source-note">Public RSS · Source links included</span></div>
+    <div id="status" class="status" role="status">Loading public trend signals…</div>
+    <section id="trendGrid" class="trend-grid" aria-live="polite"></section>
+    <section class="ideas panel">
+      <div class="ideas-heading"><div><div class="section-kicker">TURN SIGNAL INTO STORY</div><h2>Creator angle lab</h2><p>Pick a topic above or enter your own to get a starting point for your next post.</p></div><span class="idea-icon">✳</span></div>
+      <div class="idea-controls"><input id="ideaTopic" type="text" placeholder="Enter a topic to explore"><select id="format"><option value="short">Short video / Reel</option><option value="long">YouTube / long-form</option><option value="carousel">Carousel / photo post</option><option value="thread">Thread / text post</option><option value="blog">Blog / newsletter</option></select><button id="ideaBtn" class="button button-primary" type="button">Generate angles</button></div>
+      <div id="ideaResults" class="idea-results"><div class="empty-ideas">Your next idea starts with a useful question, a clear point of view, and a source you can verify.</div></div>
+    </section>
+    <section class="bottom-grid">
+      <article class="mini-panel"><span class="mini-icon">♡</span><h3>Your watchlist</h3><p>Save topics you want to follow. Your watchlist stays in this browser.</p><div id="watchlist" class="watchlist"><span class="muted">No saved topics yet.</span></div></article>
+      <article class="mini-panel"><span class="mini-icon">◎</span><h3>Cross-platform, honestly</h3><p>TrendRadar is built to bring multiple signals together. This beta currently reads public trend and news feeds—not private platform analytics.</p><p class="fineprint">TikTok, Instagram, YouTube, Facebook, Reddit and other platform-specific volume metrics will only appear when a reliable source or authorized integration is available.</p></article>
+    </section>
+    <footer><a class="brand footer-brand" href="/"><span class="brand-mark">↗</span><span>Trend<span class="brand-accent">Radar</span></span></a><span>Independent creator trend dashboard · Early beta</span><a href="mailto:manojpatil7711@gmail.com">Contact</a></footer>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
