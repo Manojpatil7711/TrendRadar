@@ -17,7 +17,7 @@ async function fetchFeed(url,source,limit,category,country="IN"){
  let lastError;
  for(const candidate of [...new Set(urls)]){
   try{
-   const response=await fetch(candidate,{headers,signal:AbortSignal.timeout(9000)});
+   const response=await fetch(candidate,{headers,signal:AbortSignal.timeout(3500)});
    if(!response.ok)throw new Error(source+" feed returned "+response.status);
    const xml=await response.text(),items=parseFeed(xml,source,limit,category,country);
    if(items.length||candidate===urls[urls.length-1])return items;
