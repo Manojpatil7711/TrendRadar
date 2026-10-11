@@ -14,3 +14,10 @@
 /* Source-to-creator actions */
 .ai-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line,rgba(148,163,184,.18))}.ai-actions .button{font-size:12px;padding:9px 11px}.ai-open-link{font-size:12px;font-weight:700;color:var(--accent,#8ba7ff);text-decoration:none;padding:8px 2px}.ai-open-link:hover{text-decoration:underline}.ai-prompt-btn{min-height:36px}
 @media(max-width:560px){.ai-actions{gap:6px}.ai-actions .button{flex:1 1 100%}.ai-open-link{padding:8px 6px}}
+
+.source-workspace{margin:16px 0;padding:16px;border:1px solid rgba(139,167,255,.22);border-radius:16px;background:rgba(18,26,43,.58)}
+.source-paste-field textarea{display:block;width:100%;box-sizing:border-box;resize:vertical;min-height:100px;margin-top:8px;padding:12px;border:1px solid var(--line,rgba(148,163,184,.22));border-radius:10px;background:var(--panel,#121a2b);color:inherit;font:inherit;line-height:1.5}
+.source-workspace-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.source-workspace-actions .button{display:inline-flex;align-items:center;justify-content:center;min-height:38px;text-decoration:none}
+.source-prompt-status{font-size:12px;line-height:1.5;color:var(--muted,#a3adc2);margin:10px 0 0}
+@media(max-width:560px){.source-workspace-actions .button{flex:1 1 100%}}
