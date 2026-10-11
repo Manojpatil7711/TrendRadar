@@ -48,3 +48,6 @@
 /* Pro members never see display ads; AdSense remains disabled until configured. */
 html[data-plan="pro"] .adsense-slot,html[data-plan="pro"] [data-adsense-slot]{display:none!important}
 [data-adsense-slot][hidden]{display:none!important}
+
+/* Sponsored placements beside the trend controls */
+.sponsored-quick-link{white-space:nowrap;text-decoration:none;align-self:stretch;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:11px;border-color:#6b5b36!important;color:#f6d98c!important;background:#241f16!important}.feed-sponsored-link{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:150px;padding:7px 11px;border:1px solid #55482e;border-radius:10px;background:#211d17;color:#f3dda5;text-decoration:none;font-size:10px;line-height:1.35}.feed-sponsored-link span{font-family:'DM Mono',monospace;letter-spacing:.7px;color:#c7b17c}.feed-sponsored-link strong{font-size:11px;font-weight:700;white-space:nowrap}.feed-sponsored-link:hover,.sponsored-quick-link:hover{border-color:#d7bd73!important;filter:brightness(1.12)}@media(max-width:680px){.sponsored-quick-link{padding-inline:10px}.feed-sponsored-link{width:100%;margin:7px 0}.feed-toolbar{flex-wrap:wrap}}
