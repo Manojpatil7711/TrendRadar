@@ -1,4 +1,4 @@
-import { randomToken } from "./auth/_lib.js";
+import { randomToken } from "./_lib.js";
 export async function onRequestGet({request,env}) {
  if(!env.GOOGLE_CLIENT_ID) return Response.redirect(new URL("/account.html?error=google_not_configured",request.url).toString(),302);
  const state=randomToken(32),url=new URL("https://accounts.google.com/o/oauth2/v2/auth");
