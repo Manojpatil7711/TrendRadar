@@ -59,13 +59,15 @@ export async function onRequestGet(context){
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
  const newsLocale={...locale};if(breaking)newsLocale.q="when:6h";else if(CATEGORIES[category])newsLocale.q=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category];
  const newsUrl="https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
- const tasks=[fetchFeed(trendsUrl,"Google Trends",40,"all",country,language),fetchFeed(newsUrl,"Google News",50,category,country,language)];
+ const tasks=[];
+ if(!breaking)tasks.push({kind:"trends",promise:fetchFeed(trendsUrl,"Google Trends",40,"all",country,language)});
+ tasks.push({kind:"news",promise:fetchFeed(newsUrl,"Google News",50,category,country,language)});
  // Additional free public newsroom feeds provide source diversity when English is selected.
- // They are used as supplementary signals, never presented as country-specific metrics.
- if(language==="en")tasks.push(fetchFeed("https://feeds.bbci.co.uk/news/world/rss.xml","BBC News",20,category,country,language),fetchFeed("https://www.aljazeera.com/xml/rss/all.xml","Al Jazeera",20,category,country,language));
- const results=await Promise.allSettled(tasks);
+ // They are supplementary global signals, not falsely labeled as country-specific metrics.
+ if(language==="en")tasks.push({kind:"newsroom",promise:fetchFeed("https://feeds.bbci.co.uk/news/world/rss.xml","BBC News",20,category,country,language)},{kind:"newsroom",promise:fetchFeed("https://www.aljazeera.com/xml/rss/all.xml","Al Jazeera",20,category,country,language)});
+ const results=await Promise.allSettled(tasks.map(task=>task.promise));
  const items=[],sources=[],errors=[];
- results.forEach((result,index)=>{if(result.status==="fulfilled"){let feedItems=result.value;if(index===0)feedItems=feedItems.filter(item=>matchesFeedLanguage(item.title,language));if(breaking&&index===0)feedItems=[];items.push(...feedItems);if(feedItems.length)sources.push(feedItems[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
+ results.forEach((result,index)=>{if(result.status==="fulfilled"){let feedItems=result.value;if(tasks[index].kind==="trends")feedItems=feedItems.filter(item=>matchesFeedLanguage(item.title,language));items.push(...feedItems);if(feedItems.length)sources.push(feedItems[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
  const unique=[...new Map(items.filter(i=>i.title).map(i=>[i.key,i])).values()].sort((a,b)=>(Date.parse(b.publishedAt)||0)-(Date.parse(a.publishedAt)||0)).slice(0,80);
  const payload={country,language,category,breaking,items:unique,sources,generatedAt:new Date().toISOString(),note:breaking?"Latest headlines are filtered to a recent six-hour window where the provider supports it; this is not a guarantee of a verified breaking-news alert. Google Trends is a search-interest signal, not a view count.":"Google Trends signals are country-specific. Google News and Bing News follow the selected country/language where supported; BBC and Al Jazeera are supplementary global English sources. Public RSS feeds do not provide reliable cross-platform video counts.",warnings:errors};
  const response=Response.json(payload,{headers:{"cache-control":"public, max-age=60, s-maxage=300","x-content-type-options":"nosniff"}});
