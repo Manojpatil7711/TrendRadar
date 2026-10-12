@@ -69,3 +69,15 @@ html[data-plan="pro"] .adsense-slot,html[data-plan="pro"] [data-adsense-slot]{di
 .breaking-country-note{margin:12px 0 0;color:#8f9fb6;font-size:10px;line-height:1.65}
 @media(max-width:1000px){.breaking-country-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:560px){.breaking-country-section{padding:15px;margin:18px 0}.breaking-country-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.breaking-country{min-height:42px;padding:9px;font-size:10px}.breaking-country-section .section-heading{align-items:flex-start;gap:10px}.breaking-country-section .category-hint{display:none}}
+
+/* Clearly labelled, user-clicked Monetag/Adsterra direct-link rotation */
+.rotation-ad-zone{margin:18px 0 22px;padding:12px;border:1px solid #344157;border-radius:12px;background:#0d1625}
+.rotation-ad-label{font:9px 'DM Mono',monospace;letter-spacing:1px;color:#91a0b5;margin:0 0 9px}
+.rotation-ad-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.rotation-ad{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 13px;border:1px solid #34445b;border-radius:9px;background:#111d2e;text-decoration:none}
+.rotation-ad span{font:9px 'DM Mono',monospace;letter-spacing:.7px;color:#b5c4d8}
+.rotation-ad strong{font-size:11px;color:#e8edf6}
+.rotation-ad.monetag-ad{border-color:#655338}.rotation-ad.monetag-ad strong{color:#f4d79b}
+.rotation-ad.adsterra-ad{border-color:#3d526e}.rotation-ad.adsterra-ad strong{color:#b7d2ff}
+.rotation-ad:hover{filter:brightness(1.14)}
+@media(max-width:560px){.rotation-ad-grid{grid-template-columns:1fr}.rotation-ad{min-height:47px}}
