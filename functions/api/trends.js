@@ -51,14 +51,17 @@ async function fetchFeed(url,source,limit,category,country="IN",language="en"){
  throw lastError||new Error(source+" feed unavailable")
 }
 export async function onRequestGet(context){
- const request=new URL(context.request.url),country=(request.searchParams.get("country")||"IN").toUpperCase(),language=(request.searchParams.get("language")||"en").toLowerCase(),category=(request.searchParams.get("category")||"all").toLowerCase(),breaking=request.searchParams.get("breaking")==="1";
+ const request=new URL(context.request.url),country=(request.searchParams.get("country")||"IN").toUpperCase(),language=(request.searchParams.get("language")||"en").toLowerCase(),category=(request.searchParams.get("category")||"all").toLowerCase(),breaking=request.searchParams.get("breaking")==="1",forceRefresh=request.searchParams.get("refresh")==="1";
  if(!NEWS[country]||!LANGS[language]||!Object.hasOwn(CATEGORIES,category))return Response.json({error:"Unsupported country, language, or category."},{status:400,headers:{"cache-control":"no-store"}});
  const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language+"&category="+category+"&breaking="+(breaking?"1":"0")),cache=typeof caches!=="undefined"?caches.default:null;
- if(cache){const cached=await cache.match(cacheKey);if(cached)return cached}
+ if(cache&&!forceRefresh){const cached=await cache.match(cacheKey);if(cached)return cached}
  const locale={...NEWS[country]};if(language!=="en"){locale.hl=LOCALE[language].hl;locale.ceid=country+":"+LOCALE[language].ceid}
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
- const newsLocale={...locale};if(breaking)newsLocale.q="when:6h";else if(CATEGORIES[category])newsLocale.q=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category];
- const newsUrl="https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
+ const newsLocale={...locale};
+ const countryNames={IN:"India",US:"United States",GB:"United Kingdom",CA:"Canada",AU:"Australia",BR:"Brazil",DE:"Germany",FR:"France",JP:"Japan",KR:"South Korea",SG:"Singapore",ZA:"South Africa",MX:"Mexico",NG:"Nigeria"};
+ const localQuery=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category]||"";
+ const searchQuery=breaking?((countryNames[country]||country)+" when:6h"):(localQuery?((countryNames[country]||country)+" "+localQuery):"");
+ const newsUrl=searchQuery?"https://news.google.com/rss/search?"+new URLSearchParams({...newsLocale,q:searchQuery}).toString():"https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
  const tasks=[];
  if(!breaking)tasks.push({kind:"trends",promise:fetchFeed(trendsUrl,"Google Trends",40,"all",country,language)});
  tasks.push({kind:"news",promise:fetchFeed(newsUrl,"Google News",50,category,country,language)});
