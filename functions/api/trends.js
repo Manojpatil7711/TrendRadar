@@ -51,19 +51,23 @@ async function fetchFeed(url,source,limit,category,country="IN",language="en"){
  throw lastError||new Error(source+" feed unavailable")
 }
 export async function onRequestGet(context){
- const request=new URL(context.request.url),country=(request.searchParams.get("country")||"IN").toUpperCase(),language=(request.searchParams.get("language")||"en").toLowerCase(),category=(request.searchParams.get("category")||"all").toLowerCase();
+ const request=new URL(context.request.url),country=(request.searchParams.get("country")||"IN").toUpperCase(),language=(request.searchParams.get("language")||"en").toLowerCase(),category=(request.searchParams.get("category")||"all").toLowerCase(),breaking=request.searchParams.get("breaking")==="1";
  if(!NEWS[country]||!LANGS[language]||!Object.hasOwn(CATEGORIES,category))return Response.json({error:"Unsupported country, language, or category."},{status:400,headers:{"cache-control":"no-store"}});
- const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language+"&category="+category),cache=typeof caches!=="undefined"?caches.default:null;
+ const cacheKey=new Request(request.origin+"/api/trends?country="+country+"&language="+language+"&category="+category+"&breaking="+(breaking?"1":"0")),cache=typeof caches!=="undefined"?caches.default:null;
  if(cache){const cached=await cache.match(cacheKey);if(cached)return cached}
  const locale={...NEWS[country]};if(language!=="en"){locale.hl=LOCALE[language].hl;locale.ceid=country+":"+LOCALE[language].ceid}
  const trendsUrl="https://trends.google.com/trending/rss?geo="+encodeURIComponent(country);
- const newsLocale={...locale};if(CATEGORIES[category])newsLocale.q=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category];
+ const newsLocale={...locale};if(breaking)newsLocale.q="when:6h";else if(CATEGORIES[category])newsLocale.q=(LOCAL_TERMS[language]&&LOCAL_TERMS[language][category])||CATEGORIES[category];
  const newsUrl="https://news.google.com/rss?"+new URLSearchParams(newsLocale).toString();
- const results=await Promise.allSettled([fetchFeed(trendsUrl,"Google Trends",40,"all",country),fetchFeed(newsUrl,"Google News",50,category,country,language)]);
+ const tasks=[fetchFeed(trendsUrl,"Google Trends",40,"all",country,language),fetchFeed(newsUrl,"Google News",50,category,country,language)];
+ // Additional free public newsroom feeds provide source diversity when English is selected.
+ // They are used as supplementary signals, never presented as country-specific metrics.
+ if(language==="en")tasks.push(fetchFeed("https://feeds.bbci.co.uk/news/world/rss.xml","BBC News",20,category,country,language),fetchFeed("https://www.aljazeera.com/xml/rss/all.xml","Al Jazeera",20,category,country,language));
+ const results=await Promise.allSettled(tasks);
  const items=[],sources=[],errors=[];
- results.forEach((result,index)=>{if(result.status==="fulfilled"){const feedItems=index===0?result.value.filter(item=>matchesFeedLanguage(item.title,language)):result.value;items.push(...feedItems);if(feedItems.length)sources.push(feedItems[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
+ results.forEach((result,index)=>{if(result.status==="fulfilled"){let feedItems=result.value;if(index===0)feedItems=feedItems.filter(item=>matchesFeedLanguage(item.title,language));if(breaking&&index===0)feedItems=[];items.push(...feedItems);if(feedItems.length)sources.push(feedItems[0].source)}else errors.push(result.reason?.message||"Feed unavailable")});
  const unique=[...new Map(items.filter(i=>i.title).map(i=>[i.key,i])).values()].sort((a,b)=>(Date.parse(b.publishedAt)||0)-(Date.parse(a.publishedAt)||0)).slice(0,80);
- const payload={country,language,category,items:unique,sources,generatedAt:new Date().toISOString(),note:"Google Trends signals are country-specific. News headlines follow the selected feed language where supported. Public RSS feeds do not provide reliable cross-platform video counts.",warnings:errors};
+ const payload={country,language,category,breaking,items:unique,sources,generatedAt:new Date().toISOString(),note:breaking?"Latest headlines are filtered to a recent six-hour window where the provider supports it; this is not a guarantee of a verified breaking-news alert. Google Trends is a search-interest signal, not a view count.":"Google Trends signals are country-specific. Google News and Bing News follow the selected country/language where supported; BBC and Al Jazeera are supplementary global English sources. Public RSS feeds do not provide reliable cross-platform video counts.",warnings:errors};
  const response=Response.json(payload,{headers:{"cache-control":"public, max-age=60, s-maxage=300","x-content-type-options":"nosniff"}});
  if(cache)context.waitUntil(cache.put(cacheKey,response.clone()));
  return response;
