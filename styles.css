@@ -111,3 +111,31 @@ body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .alert-dialog h2{font-size:clamp(25px,4vw,32px);line-height:1.12}
 @media(max-width:680px){.hero-main h1{font-size:clamp(35px,10vw,48px);letter-spacing:-.055em}.hero-main>p{line-height:1.75}.button{min-height:42px}.trend-card:hover,.source-links a:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* Mobile-first readability pass: increase reading sizes without changing layout */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-size:15px;line-height:1.65}
+p,li{line-height:1.75}
+.section-heading p,.studio-top p,.hero-main>p,.panel-heading p,.breaking-country-note{font-size:14px;line-height:1.8}
+.hero-overline,.side-label,.breadcrumb,.filter-title,.field label,.section-kicker,.panel-eyebrow,.breaking-country-note,.rotation-ad-label{font-size:11px;line-height:1.6}
+.trend-card h3{font-size:16px;line-height:1.55}
+.trend-card p,.trend-card .summary,.trend-card .description{font-size:14px;line-height:1.75}
+.button,.feed-tab,.nav-item,.breaking-country,.category-chip,.filter-grid button,.source-links a,.text-action,.ai-prompt-btn,.refresh-button{font-size:13px;line-height:1.45}
+.field input,.field select,.search-input-wrap input,.sort-wrap select,.watch-controls select{font-size:14px;min-height:42px}
+@media(max-width:680px){
+ body{font-size:15px;line-height:1.7}
+ .hero-main h1{font-size:clamp(36px,10vw,48px);line-height:1.08}
+ .hero-main>p,.section-heading p,.studio-top p,.panel-heading p{font-size:15px;line-height:1.8}
+ .trend-card h3{font-size:17px;line-height:1.5}
+ .trend-card p,.trend-card .summary,.trend-card .description{font-size:14.5px;line-height:1.8}
+ .breaking-country{font-size:12px;min-height:44px}
+ .breaking-country-note{font-size:12px;line-height:1.75}
+ .rotation-ad-label,.hero-overline,.side-label,.breadcrumb,.filter-title,.field label,.section-kicker,.panel-eyebrow{font-size:11px}
+ .button,.feed-tab,.nav-item,.category-chip,.filter-grid button,.source-links a,.text-action,.ai-prompt-btn,.refresh-button{font-size:13px;min-height:42px}
+ .source-links a{padding:10px 12px}
+}
+@media(max-width:380px){
+ .hero-main h1{font-size:34px}
+ .trend-card h3{font-size:16px}
+}
