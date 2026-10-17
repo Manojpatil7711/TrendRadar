@@ -81,3 +81,33 @@ html[data-plan="pro"] .adsense-slot,html[data-plan="pro"] [data-adsense-slot]{di
 .rotation-ad.adsterra-ad{border-color:#3d526e}.rotation-ad.adsterra-ad strong{color:#b7d2ff}
 .rotation-ad:hover{filter:brightness(1.14)}
 @media(max-width:560px){.rotation-ad-grid{grid-template-columns:1fr}.rotation-ad{min-height:47px}}
+
+
+/* TrendRadar premium typography and interaction polish — additive, layout-safe */
+:root{--focus-ring:rgba(201,243,106,.62);--elevation:0 18px 48px rgba(0,0,0,.22)}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.brand-name,.side-label,.hero-overline,.breadcrumb strong,.section-heading h2,.studio-top h2,.filter-title strong,.panel-heading h3,.trend-card h3,.utility-panel h3,.alert-dialog h2,.pro-launch-copy h2{font-weight:800;letter-spacing:-.035em}
+.hero-main h1{font-weight:800;letter-spacing:-.065em;line-height:1.02;text-wrap:balance}
+.hero-main h1 span,.section-heading h2 span,.studio-top h2 span{font-weight:800;background:linear-gradient(105deg,#d8ff88 0%,#c9f36a 42%,#a9c6ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-main>p{font-size:clamp(14px,1.2vw,16px);line-height:1.85;color:#c3cde0}
+.hero-main>p strong{font-weight:800;color:#f7f9ff}
+.hero-quick{font-weight:700;letter-spacing:.01em}
+.button,.feed-tab,.nav-item,.breaking-country,.rotation-ad,.source-links a,.category-chip,.watch-chip button,.ai-prompt-btn,.text-action,.filter-grid button,.refresh-button{font-weight:750;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease}
+.button:hover,.ai-prompt-btn:hover,.refresh-button:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.button:active,.ai-prompt-btn:active,.refresh-button:active{transform:translateY(0)}
+.filter-panel,.utility-panel,.trend-card,.studio-panel,.pro-launch-panel,.breaking-country-section,.trust-strip{box-shadow:0 12px 34px rgba(0,0,0,.12)}
+.filter-panel,.utility-panel,.studio-panel,.pro-launch-panel{border-color:#34445f}
+.trend-card{border-color:#2d3d56;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.trend-card:hover{transform:translateY(-2px);border-color:#657b9a;box-shadow:var(--elevation)}
+.trend-card h3{font-size:15px;line-height:1.45;color:#f5f7fc}
+.panel-heading h3,.filter-title strong{font-size:14px}
+.panel-heading p,.section-heading p,.studio-top p{line-height:1.75}
+.field input,.field select,.search-input-wrap input,.sort-wrap select,.watch-controls select{font-weight:650}
+.field input:focus-visible,.field select:focus-visible,.search-input-wrap:focus-within,.sort-wrap select:focus-visible,.watch-controls select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+.feed-tab.active,.nav-item.active{font-weight:800}
+.category-chip,.feed-tab,.breaking-country,.rotation-ad{border-radius:11px}
+.source-links a:hover{border-color:#667b99;background:#18263a;transform:translateY(-1px)}
+.footer a{font-weight:700}
+.alert-dialog h2{font-size:clamp(25px,4vw,32px);line-height:1.12}
+@media(max-width:680px){.hero-main h1{font-size:clamp(35px,10vw,48px);letter-spacing:-.055em}.hero-main>p{line-height:1.75}.button{min-height:42px}.trend-card:hover,.source-links a:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
