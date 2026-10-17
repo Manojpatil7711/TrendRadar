@@ -2,4 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://trendradar-c30.pages.dev/sitemap.xml
-Sitemap: https://trendradar-c30.pages.dev/sitemap-v2.xml
